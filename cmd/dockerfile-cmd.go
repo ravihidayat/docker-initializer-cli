@@ -5,9 +5,12 @@ Copyright © 2022 NAME HERE <EMAIL ADDRESS>
 package cmd
 
 import (
+	"fmt"
 	"os"
 	"path/filepath"
+	"strings"
 
+	"github.com/ravihidayat/docker-initializer-cli/templates"
 	"github.com/spf13/cobra"
 )
 
@@ -17,8 +20,13 @@ var dockerfileCmd = &cobra.Command{
 	Short: "Creates a Dockerfile.",
 	Long: `Creates a new Dockerfile based upon the base
 	configuration for a `,
-	Example: `docker-initializer create dockerfile`,
-	Run:     runCreateDockerfile,
+	Example: `  
+	1. docker-initializer create dockerfile 
+	--image=node --env=NODE_ENV=PRODUCTION,APP=appName --tag=alpine --workdir=/app --relPath=.
+	2. docker-initializer create dockerfile --image=node --tag=latest --relPath=.
+	3. docker-initializer create dockerfile 
+	`,
+	Run: runCreateDockerfile,
 }
 
 func check(e error) {
@@ -30,6 +38,11 @@ func check(e error) {
 func init() {
 	createCmd.AddCommand(dockerfileCmd)
 
+	dockerfileCmd.PersistentFlags().String("image", "", "An image name set as the base image for the Dockerfile e.g node, postgres")
+	dockerfileCmd.PersistentFlags().String("env", "", "A variable-value pair set as the environment variables e.g POSTGRES_PASSWORD=secret")
+	dockerfileCmd.PersistentFlags().String("tag", "", "The tag of the corresponding image e.g alpine, latest")
+	dockerfileCmd.PersistentFlags().String("workdir", "", "The working directory path e.g src/app")
+	dockerfileCmd.PersistentFlags().String("relPath", "", "The relative app of the app from the Dockerfile location e.g .")
 	// Here you will define your flags and configuration settings.
 
 	// Cobra supports Persistent Flags which will work for this command
@@ -47,12 +60,55 @@ func init() {
 // }
 
 func runCreateDockerfile(cmd *cobra.Command, args []string) {
-	createDockerfile()
+	image, _ := cmd.Flags().GetString("image")
+	env, _ := cmd.Flags().GetString("env")
+	tag, _ := cmd.Flags().GetString("tag")
+	workdir, _ := cmd.Flags().GetString("workdir")
+	relPath, _ := cmd.Flags().GetString("relPath")
+
+	if len(image) == 0 && len(args) < 1 {
+		cmd.Help()
+		os.Exit(0)
+	}
+
+	createDockerfile(image, env, tag, workdir, relPath, args)
 }
 
-func createDockerfile() {
+func createDockerfile(image string, env string, tag string, workdir string, relPath string, args []string) {
 	filepath, _ := filepath.Abs("./Dockerfile")
 	file, err := os.Create(filepath)
 	check(err)
 	defer file.Close()
+
+	var template string
+
+	switch image {
+
+	case "node":
+		envSplit := (envSplit(env))
+		template = templates.NodeDockerfile
+		fmt.Print(envSplit)
+
+	case "postgres":
+		envSplit := (envSplit(env))
+		template = templates.PostgresDockerfile
+		template = strings.Replace(template, "{{.tag}}", tag, 1)
+		template = strings.Replace(template, "{{.env}}", envSplit, 1)
+
+	}
+
+	_, err2 := file.WriteString(template)
+	check(err2)
+}
+
+func envSplit(env string) string {
+	envSplit := strings.Split(env, ",")
+
+	var envs string = ``
+
+	for i := 0; i < len(envSplit); i++ {
+		envs += "ENV " + strings.Replace(envSplit[i], "=", " ", 1) + "\n"
+	}
+
+	return envs
 }
