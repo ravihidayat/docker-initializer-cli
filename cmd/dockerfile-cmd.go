@@ -5,7 +5,6 @@ Copyright © 2022 NAME HERE <EMAIL ADDRESS>
 package cmd
 
 import (
-	"fmt"
 	"os"
 	"path/filepath"
 	"strings"
@@ -87,14 +86,16 @@ func createDockerfile(image string, env string, tag string, workdir string, relP
 	case "node":
 		envSplit := (envSplit(env))
 		template = templates.NodeDockerfile
-		fmt.Print(envSplit)
+		template = strings.Replace(template, "{{.tag}}", tag, 1)
+		template = strings.Replace(template, "{{.env}}", envSplit, 1)
+		template = strings.Replace(template, "{{.relPath}}", relPath, 1)
+		template = strings.Replace(template, "{{.workdir}}", workdir, 1)
 
 	case "postgres":
 		envSplit := (envSplit(env))
 		template = templates.PostgresDockerfile
 		template = strings.Replace(template, "{{.tag}}", tag, 1)
 		template = strings.Replace(template, "{{.env}}", envSplit, 1)
-
 	}
 
 	_, err2 := file.WriteString(template)
