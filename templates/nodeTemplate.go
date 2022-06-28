@@ -1,7 +1,7 @@
 package templates
 
 var NodeDockerfile string = `
-FROM postgres:{{.tag}}
+FROM node:{{.tag}}
 {{.env}}
 WORKDIR {{.workdir}}
 RUN npm install
