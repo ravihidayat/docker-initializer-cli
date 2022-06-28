@@ -79,23 +79,48 @@ func createDockerfile(image string, env string, tag string, workdir string, relP
 	check(err)
 	defer file.Close()
 
+	if tag == "" {
+		tag = "latest"
+	}
+
+	if relPath == "" {
+		relPath = "."
+	}
+
+	if workdir == "" {
+		workdir = "/app"
+	}
+
 	var template string
 
 	switch image {
 
 	case "node":
-		envSplit := (envSplit(env))
+
 		template = templates.NodeDockerfile
 		template = strings.Replace(template, "{{.tag}}", tag, 1)
-		template = strings.Replace(template, "{{.env}}", envSplit, 1)
+
+		if env != "" {
+			envSplit := (envSplit(env))
+			template = strings.Replace(template, "{{.env}}", envSplit, 1)
+		} else if env == "" {
+			template = strings.Replace(template, "{{.env}}", "ENV NODE_ENV production", 1)
+		}
+
 		template = strings.Replace(template, "{{.relPath}}", relPath, 1)
 		template = strings.Replace(template, "{{.workdir}}", workdir, 1)
 
 	case "postgres":
-		envSplit := (envSplit(env))
+
 		template = templates.PostgresDockerfile
 		template = strings.Replace(template, "{{.tag}}", tag, 1)
-		template = strings.Replace(template, "{{.env}}", envSplit, 1)
+
+		if env != "" {
+			envSplit := (envSplit(env))
+			template = strings.Replace(template, "{{.env}}", envSplit, 1)
+		} else if env == "" {
+			template = strings.Replace(template, "{{.env}}", "ENV POSTGRES_PASSWORD secret", 1)
+		}
 	}
 
 	_, err2 := file.WriteString(template)
