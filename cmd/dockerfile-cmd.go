@@ -16,14 +16,17 @@ import (
 // dockerfileCmd represents the dockerfile command
 var dockerfileCmd = &cobra.Command{
 	Use:   "dockerfile",
-	Short: "Creates a Dockerfile.",
-	Long: `Creates a new Dockerfile based upon the base
-	configuration for a `,
+	Short: "Create a Dockerfile in the current folder.",
+	Long: `The dockerfile command creates a new Dockerfile based upon
+	the arguments passed. Only node and postgres currently available. 
+	`,
 	Example: `  
 	1. docker-initializer create dockerfile 
 	--image=node --env=NODE_ENV=PRODUCTION,APP=appName --tag=alpine --workdir=/app --relPath=.
 	2. docker-initializer create dockerfile --image=node --tag=latest --relPath=.
-	3. docker-initializer create dockerfile 
+	3. docker-initializer create dockerfile --image=node
+	4. docker-initializer create dockerfile --image=postgres --env=POSTGRES_PASSWORD=secret
+	5. docker-initializer create dockerfile --image=postgres
 	`,
 	Run: runCreateDockerfile,
 }
