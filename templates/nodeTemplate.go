@@ -7,5 +7,5 @@ WORKDIR {{.workdir}}
 RUN npm install
 COPY {{.relPath}} .
 EXPOSE 3000
-CMD npm start
+CMD ["npm", "start"]
 `
