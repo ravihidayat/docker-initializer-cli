@@ -1,7 +1,7 @@
 package templates
 
 var MernDockerCompose string = `
-version: '3.1'
+version: '3.7'
 
 services:
     node:
@@ -11,10 +11,12 @@ services:
       ports:
           - '3000:3000'
       volumes: 
-        - .:/app/mern-docker-app
+        - .:/app
     
     mongo:
-      image: {.param}
+      image: mongo:{{.dbTag}}
+      env_file:
+        - .env
       ports: 
         - '27017:27017'
       volumes:
@@ -24,11 +26,11 @@ services:
 
 var MernDockerfile string = `
 
-FROM node:latest
+FROM node:{{.nodeTag}}
 
-WORKDIR /app/mern-docker-app
+WORKDIR /app
 
 EXPOSE 3000
 
-CMD [ "yarn","start-dev" ]
+CMD [ "npm","start" ]
 `

@@ -17,7 +17,7 @@ import (
 var dockerfileCmd = &cobra.Command{
 	Use:   "dockerfile",
 	Short: "Create a Dockerfile in the current folder.",
-	Long: `The dockerfile command creates a new Dockerfile based upon
+	Long: `The dockerfile command create a new Dockerfile based upon
 	the arguments passed. Only node and postgres currently available. 
 	`,
 	Example: `  
