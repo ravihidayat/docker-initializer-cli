@@ -10,6 +10,7 @@ import (
 	"strings"
 
 	"github.com/ravihidayat/docker-initializer-cli/templates"
+	"github.com/ravihidayat/docker-initializer-cli/utils"
 	"github.com/spf13/cobra"
 )
 
@@ -67,6 +68,7 @@ func runCreateDockerCompose(cmd *cobra.Command, args []string) {
 }
 
 func createDockerCompose(projectName string, stack string, nodeTag string, env string, dbUsername string, dbPassword string, dbName string, dbTag string) {
+	file := utils.CreateFile("docker-compose.yml", ".")
 
 	if nodeTag == "" {
 		nodeTag = "latest"
@@ -93,8 +95,8 @@ func createDockerCompose(projectName string, stack string, nodeTag string, env s
 		dockerComposeTemplate = strings.Replace(dockerComposeTemplate, "{{.dbTag}}", dbTag, 1)
 		env, _ := filepath.Abs(".env")
 		envFile, err := os.Create(env)
-		check(err)
-		defer file.Close()
+		utils.Check(err)
+		defer envFile.Close()
 
 		envs = `
 		MONGO_INITDB_ROOT_USERNAME={{.dbUsername}}
@@ -114,7 +116,7 @@ func createDockerCompose(projectName string, stack string, nodeTag string, env s
 		}
 
 		_, err3 := envFile.WriteString(envs)
-		check(err3)
+		utils.Check(err3)
 
 	case "pern":
 		dockerComposeTemplate = templates.PernDockerCompose
@@ -122,5 +124,5 @@ func createDockerCompose(projectName string, stack string, nodeTag string, env s
 	}
 
 	_, err2 := file.WriteString(dockerComposeTemplate)
-	check(err2)
+	utils.Check(err2)
 }

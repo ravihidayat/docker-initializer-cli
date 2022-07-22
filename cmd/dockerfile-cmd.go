@@ -6,10 +6,10 @@ package cmd
 
 import (
 	"os"
-	"path/filepath"
 	"strings"
 
 	"github.com/ravihidayat/docker-initializer-cli/templates"
+	"github.com/ravihidayat/docker-initializer-cli/utils"
 	"github.com/spf13/cobra"
 )
 
@@ -71,10 +71,7 @@ func runCreateDockerfile(cmd *cobra.Command, args []string) {
 }
 
 func createDockerfile(image string, env string, tag string, workdir string, relPath string, args []string) {
-	filepath, _ := filepath.Abs("./Dockerfile")
-	file, err := os.Create(filepath)
-	check(err)
-	defer file.Close()
+	file := utils.CreateFile("Dockerfile", ".")
 
 	if tag == "" {
 		tag = "latest"
@@ -121,7 +118,7 @@ func createDockerfile(image string, env string, tag string, workdir string, relP
 	}
 
 	_, err2 := file.WriteString(template)
-	check(err2)
+	utils.Check(err2)
 }
 
 func envSplit(env string) string {
