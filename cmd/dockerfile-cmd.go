@@ -31,12 +31,6 @@ var dockerfileCmd = &cobra.Command{
 	Run: runCreateDockerfile,
 }
 
-func check(e error) {
-	if e != nil {
-		panic(e)
-	}
-}
-
 func init() {
 	createCmd.AddCommand(dockerfileCmd)
 

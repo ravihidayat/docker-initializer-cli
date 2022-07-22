@@ -67,10 +67,6 @@ func runCreateDockerCompose(cmd *cobra.Command, args []string) {
 }
 
 func createDockerCompose(projectName string, stack string, nodeTag string, env string, dbUsername string, dbPassword string, dbName string, dbTag string) {
-	composePath, _ := filepath.Abs("./docker-compose.yml")
-	file, err := os.Create(composePath)
-	check(err)
-	defer file.Close()
 
 	if nodeTag == "" {
 		nodeTag = "latest"
